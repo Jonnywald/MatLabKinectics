@@ -66,7 +66,7 @@ global pt;
 global k;
 for p = p_range
     for t = t_range
-        lnkatkat0(i,j) = (da/R)*log(t/t0)+(db/(2*R))*(t-t0)+(dc/(6*R))*(((t).^2)-((t0).^2))+(dd/(12*R))*(((t).^3)-((t0).^3))+(1/R)*((-dHt0)+(da*t0)+(db*((t0.^2)/2))+(dc*((t0.^3)/3))+(dd*((t0.^4)/4)))*((1/t)-(1/t0));
+        lnkatkat0(i,j) = (da/R)*log(t/t0)+(db/(2*R))*(t-t0)+(dc/(6*R))*(((t).^2)-((t0).^2))+(dd/(12*R))*(((t).^3)-((t0).^3))+(1/R)*(-dHt0)+(da*t0)+(db*((t0.^2)/2))+dc*((t0.^3)/3)+dd*((t0.^4)/4))*((1/t)-(1/t0));
         CHR_lnkatkat0(i,j) = (-dHt0/R)*((1/t)-(1/t0));
         kat(i,j) = exp(lnkatkat0(i) + log(Kat0));
         CHR_Kat(i,j) = exp(CHR_lnkatkat0(i) + log(Kat0));
