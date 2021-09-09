@@ -16,8 +16,8 @@ d_N2O4 = 0;
 
 t0 = 298.15; %temperature of the standart state in Kelvin
 R = 0.0831446261815324; %R gas constant L*bar*K-1*mol-1
-dHt0 = 9.2; % heat of formation of N2O4 at 25C in KJ/Mol
-dGt0 = 97.9; % gibbs free energy of N2O4 at 25C in KJ/Mol
+dHt0 = 33.2; % heat of formation of NO2 at 25C in KJ/Mol
+dGt0 = 51.3; % gibbs free energy of NO2 at 25C in KJ/Mol
 Kat0 = exp((-dGt0)/(R*t0)); %calc of the Ka at the standart state
 % [NO2]
 % [N2O4]
@@ -68,8 +68,8 @@ for p = p_range
     for t = t_range
         lnkatkat0(i,j) = (da/R)*log(t/t0)+(db/(2*R))*(t-t0)+(dc/(6*R))*(((t).^2)-((t0).^2))+(dd/(12*R))*(((t).^3)-((t0).^3))+(1/R)*((-dHt0)+(da*t0)+(db*((t0.^2)/2))+(dc*((t0.^3)/3))+(dd*((t0.^4)/4)))*((1/t)-(1/t0));
         CHR_lnkatkat0(i,j) = (-dHt0/R)*((1/t)-(1/t0));
-        kat(i,j) = exp(lnkatkat0(i) + log(Kat0));
-        CHR_Kat(i,j) = exp(CHR_lnkatkat0(i) + log(Kat0));
+        kat(i,j) = exp(lnkatkat0(i,j) + log(Kat0));
+        CHR_Kat(i,j) = exp(CHR_lnkatkat0(i,j) + log(Kat0));
         pt = p;
         k = kat(i,j);
         zeta(i,j) = fsolve(@myfunc,x0);
@@ -81,7 +81,7 @@ for p = p_range
     j = j + 1;
 end
 
-
+hold on
 plot(t_range,zeta)
 xlabel("temperature (K)")
 ylabel("Extent of reaction")
@@ -92,8 +92,8 @@ plot(t_range,CHR_zeta)
 xlabel("temperature (K)")
 ylabel("Extent of reaction")
 legend("0.1 bar","1.0 bar","10.0 bar")
-title("Extent of reaction over temperature (varying pressure)")
-
+title("Extent over temp (varying pressure & constant heat of reaction)")
+hold off
 function u = myfunc(z)
     global pt;
     global k;
