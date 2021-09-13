@@ -130,6 +130,13 @@ yiT = yMCP + y2_MP + yH2 + yHex; %yT = 1
 %----------|------|----------------|-----------------------|
 % Total    |  2   | 2 - zeta (NiT) |           1           |
 
+%         yC
+% Ka = --------- * Pt/1atm
+%       yA * yB
+
+%                zeta
+% Ka = ------------------------ * (2 - zeta) * Pt/1atm
+%       (1 - zeta) * (1 - zeta)
 
 %the clausius-clapeyron equation
 %               dHvap
@@ -147,6 +154,12 @@ P = 1.0; %atm
 %a) over what temperature range does the reactor contain a liquid phase?
 lnPc = c - (dHvap)/(R*T0);
 Pc = exp(lnPc);
+
+% van hoff
+
+% Ln (Ka/8) = (-dH0/r)*(1/T - 1/T0)
+
+
 
 % Problem 3)
 % RAW 4.2
@@ -191,13 +204,193 @@ Pc = exp(lnPc);
 % Ka3 = ------- * ----
 %        yH2^2    1bar
 
-%       z1 * (2*z1 + z2 -2*z3)^2
-% Ka1 = ------------------------- * (1+z1+z2+z3)
-%           (1 - 2*z1 - z2)^2
+%       z1 * (2*z1 + z2 -2*z3)^2          1
+% Ka1 = ------------------------- * -------------
+%           (1 - 2*z1 - z2)^2       (1+z1+z2+z3)
 
-%         z2 * (2*z1 + z2 -2*z3)     
-% Ka2 = -------------------------- * (1+z1+z2+z3)
-%           (1 - 2*z1 - z2)          
+%         z2 * (2*z1 + z2 -2*z3)           1
+% Ka2 = -------------------------- * -------------
+%           (1 - 2*z1 - z2)          (1+z1+z2+z3)
+
+%                z3    
+% Ka3 = --------------------- * (1+z1+z2+z3)
+%        (2*z1 + z2 -2*z3)^2
+
+T0 = 298.15; %standart state temp in K
+R = 8.31446261815324 / 1000; % Gas constant KJ . K-1 . mol-1
+
+% heat of formation of each component at standart state:
+dH_H2O = -241.8; %KJ/mol
+dH_CO2 = -393.5; %KJ/mol
+dH_CO = -110.5; %KJ/mol
+dH_H2 = 0; %KJ/mol
+dH_CH4 = -74.5; %KJ/mol
+
+% gibbs free energy of each component at standart state:
+dGH2O = -228.6; %KJ/mol
+dGCO2 = -394.4; %KJ/mol
+dGCO = -137.2; %KJ/mol
+dGH2 = 0; %KJ/mol
+dGCH4 = -50.5; %KJ/mol
+
+%heat capacities of the components:
+aH2O = 32.218;
+aCO2 = 22.243;
+aCO = 28.142;
+aH2 = 29.088;
+aCH4 = 19.875;
+bH2O = 0.192 / 100;
+bCO2 = 5.977 / 100;
+bCO = 0.167 / 100;
+bH2 = -0.192 / 100;
+bCH4 = 5.021 / 100;
+cH2O = 1.055 / 100000;
+cCO2 = -3.499 / 100000;
+cCO = 0.537 / 100000;
+cH2 = 0.4 / 100000;
+cCH4 = 1.268 / 100000;
+dH2O = -3.593 / 1000000000;
+dCO2 = 7.464 / 1000000000;
+dCO = -2.221 / 1000000000;
+dH2 = -0.870 / 1000000000;
+dCH4 = -11.004 / 1000000000;
+
+% calc of the delta "a" of each reaction
+da1 = -2*aH2O + aCO2 + 2*aH2;
+da2 = -aH2O + aCO + aH2;
+da3 = -2*aH2 + aCH4;
+
+% calc of the delta "b" of each reaction
+db1 = -2*bH2O + bCO2 + 2*bH2;
+db2 = -bH2O + bCO + bH2;
+db3 = -2*bH2 + bCH4;
+
+% calc of the delta "c" of each reaction
+dc1 = -2*cH2O + cCO2 + 2*cH2;
+dc2 = -cH2O + cCO + cH2;
+dc3 = -2*cH2 + cCH4;
+
+% calc of the delta "d" of each reaction
+dd1 = -2*dH2O + dCO2 + 2*dH2;
+dd2 = -dH2O + dCO + dH2;
+dd3 = -2*dH2 + dCH4;
+
+% calc of the delta H of the standart state for each reaction
+dHt0_1 = -2*dH_H2O + dH_CO2 + 2*dH_H2;
+dHt0_2 = -dH_H2O + dH_CO + dH_H2;
+dHt0_3 = -2*dH_H2 + dH_CH4;
+
+% calc of the delta G of the standart state for each reaction
+dGt0_1 = -2*dGH2O + dGCO2 + 2*dGH2;
+dGt0_2 = -dGH2O + dGCO + dGH2;
+dGt0_3 = -2*dGH2 + dGCH4;
+
+%calc of Kt0 of each reaction:
+Kt0_1 = exp((-dGt0_1)/(R*T0));
+Kt0_2 = exp((-dGt0_2)/(R*T0));
+Kt0_3 = exp((-dGt0_3)/(R*T0));
+
+%settng up the temperature range of 600 K to 1600K
+t_range = linspace(600,1600,1000); 
+
+%initial Guess for fsolve
+x0 = [0.05,0.05,0.05];
+i = 1;
+
+%Preallocation of matrix to save time
+molH2O = zeros(1,1000);
+molCO2 = zeros(1,1000);
+molCO = zeros(1,1000);
+molH2 = zeros(1,1000);
+molCH4 = zeros(1,1000);
+
+for t = t_range
+    
+    %item 1 of van hoff for the reaction 1
+    item1_1 = (da1/R)*log(t/T0);
+    %item 2 of van hoff for the reaction 1
+    item2_1 = (db1/(2*R))*(t-T0);
+    %item 3 of van hoff for the reaction 1
+    item3_1 = (dc1/(6*R))*((t.^2)-(T0.^2));
+    %item 4 of van hoff for the reaction 1
+    item4_1 = (dd1/(12*R))*((t.^3)-(T0.^3));
+    %item 5 of van hoff for the reaction 1
+    item5_1 = (1/R)*(-dHt0_1+da1*t+(db1/2)*(t.^2)+(dc1/3)*(t.^3)+(dd1/4)*(t.^4))*((1/t)-(1/T0));
+    
+    %item 1 of van hoff for the reaction 2
+    item1_2 = (da2/R)*log(t/T0);
+    %item 2 of van hoff for the reaction 2
+    item2_2 = (db2/(2*R))*(t-T0);
+    %item 3 of van hoff for the reaction 2
+    item3_2 = (dc2/(6*R))*((t.^2)-(T0.^2));
+    %item 4 of van hoff for the reaction 2
+    item4_2 = (dd2/(12*R))*((t.^3)-(T0.^3));
+    %item 5 of van hoff for the reaction 2
+    item5_2 = (1/R)*(-dHt0_2+da2*t+(db2/2)*(t.^2)+(dc2/3)*(t.^3)+(dd2/4)*(t.^4))*((1/t)-(1/T0));
+    
+    %item 1 of van hoff for the reaction 3
+    item1_3 = (da3/R)*log(t/T0);
+    %item 2 of van hoff for the reaction 3
+    item2_3 = (db3/(2*R))*(t-T0);
+    %item 3 of van hoff for the reaction 3
+    item3_3 = (dc3/(6*R))*((t.^2)-(T0.^2));
+    %item 4 of van hoff for the reaction 3
+    item4_3 = (dd3/(12*R))*((t.^3)-(T0.^3));
+    %item 5 of van hoff for the reaction 3
+    item5_3 = (1/R)*(-dHt0_3+da3*t+(db3/2)*(t.^2)+(dc3/3)*(t.^3)+(dd3/4)*(t.^4))*((1/t)-(1/T0));
+    
+    %calc of the van hoff eqn for each reaction
+    lnktkt0_1 = item1_1 + item2_1 + item3_1 + item4_1 + item5_1;
+    lnktkt0_2 = item1_2 + item2_2 + item3_2 + item4_2 + item5_2;
+    lnktkt0_3 = item1_3 + item2_3 + item3_3 + item4_3 + item5_3;
+    
+    Kt1 = exp(lnktkt0_1+log(Kt0_1));
+    Kt2 = exp(lnktkt0_2+log(Kt0_2));
+    Kt3 = exp(lnktkt0_3+log(Kt0_3));
+       
+    %solving the system
+    values = fsolve(@(z)prob4(z,Kt1,Kt2,Kt3),x0);
+    
+    %assinging the extent of reactions
+    z1 = values(1);
+    z2 = values(2);
+    z3 = values(3);
+    
+    %calculating the composition:
+    NiT = 1 + z1 + z2 + z3;
+    yH2O = (1 - 2*z1 - z2)/NiT;
+    yCO2 = z1/NiT;
+    yCO = z2/NiT;
+    yH2 = (2*z1 + z2 -2*z3)/NiT;
+    yCH4 = z3/NiT;
+    
+    yT = yH2O + yCO2 + yCO + yH2 + yCH4;
+    
+    %creating a vector with the molar fraction of each component:
+    molH2O(i) = yH2O;
+    molCO2(i) = yCO2;
+    molCO(i) = yCO;
+    molH2(i) = yH2;
+    molCH4(i) = yCH4;
+    
+    i = i + 1;
+end
+
+plot(t_range,molH2O);
+xlabel("Temperature (K)");
+ylabel("Molar composition");
+t
+plot(t_range,molCO2);
+plot(t_range,molCO);
+plot(t_range,molH2);
+plot(t_range,molCH4);
+
+
+function F = prob4(z,Kt1,Kt2,Kt3)
+    F(1) = ((z(1)*((2*z(1)+z(2)-2*z(3)).^2))/((1-2*z(1)-z(2)).^2))*(1/(1+z(1)+z(2)+z(3))) - Kt1;
+    F(2) = ((z(2)*(2*z(1)+z(2)-2*z(3)))/(1-2*z(1)-z(2)))*(1/(1+z(1)+z(2)+z(3)))- Kt2;
+    F(3) = (z(3)/((2*z(1)+z(2)-2*z(3)).^2))*(1+z(1)+z(2)+z(3))- Kt3;
+end
 
 function u = eqn(z)
     u(1) = ((z(1).^2)/(1-z(1)-2*(z(1).^2)))-exp(((-14.410000000000000)/(0.082057366080960))*((1/z(2))-(1/600))+log(0.945868124008406));
