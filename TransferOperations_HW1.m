@@ -96,4 +96,13 @@ fn = sn * area; %N
 % vortices will appear (Taylor`s vortices), make the torque mesuared no
 % compatible with the viscosity of the fluid
 
+%Problem 3
 
+Eta0 = 3; %Pa * s
+EtaInf = 1; %Pa * s
+n = 0.6;
+k1 = 0.02; %s^-0.4
+k2 = 0.016; %s^-1
+t1 = 5; %s
+
+%(a)
