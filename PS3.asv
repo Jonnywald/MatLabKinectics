@@ -135,26 +135,19 @@ k1 = 0.5; %min-1
 k2 = 0.25; %min-1
 k3 = 0.1; %min-1
 
-t_range = linspace(0,20,120);
+t_range = linspace(0,60,121); %30 seconds "step" over 1 hour
 global con kk1 kk2 kk3;
 i = 1;
-Ca = zeros(1,120);
-Cb = zeros(1,120);
-Cc = zeros(1,120);
-
-
+Ca = zeros(1,121);
+Cb = zeros(1,121);
+Cc = zeros(1,121);
 for t = t_range
     Ca(i) = Ca0*exp(-k1*t);
-    con = Ca(i);
-    kk1 = k1;
-    kk2 = k2;
-    kk3 = k3;
-    [y,x] = ode45(@prob2,t_range,[0 0]);
-    Cb(i) = x(i,1);
-    Cc(i) = x(i,2);
+    x = ode45(@p,[0 60],[0 0]);
+    Cb(i) = x(1);
+    Cc(i) = x(2);
     i =i+1;
 end
-
 
 hold on
 plot(t_range,Ca,"- k")
@@ -244,9 +237,9 @@ fulgacityCH4 = phiCH4 * yCH4 * Pt; %f = 241.9417151382955 bar
 function f = cmp(z,A,B)
 f = z.^3 - (1-B)*z.^2 + (A-3*(B.^2)-2*B)*z - (A*B -B.^2 - B.^3);
 end
-function u = prob2(t,x)
-    global con kk1 kk2 kk3;
-    dcbdt = kk1*con - kk2*x(1) + kk3*x(2);
-    dccdt = kk2*x(1) - kk3*x(2);
-    u = [dcbdt;dccdt];
+function u = prob2(x,Ca,k1,k2,k3)
+    
+    u(1) = k1*Ca - k2*x(1) + k3*x(2);
+    u(2) = k2*x(1) - k3*x(2);
+
 end
