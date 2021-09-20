@@ -82,8 +82,9 @@ rCPO = k*cPO; %0.461228067366740 mol / L * h
 
 %for constant mass:
 
-%total mass a the start
+%total mass at the start
 mass = (densMet * V / 0.001)/1000; %791.4 Kg
+
 
 %(b)
 
@@ -131,39 +132,35 @@ rCPO = k*cPO; %0.396194909868030 mol / L * h
 % A -> B <-> C
 
 Ca0 = 1.0;
+Cb0 = 0.0;
+Cc0 = 0.0;
 k1 = 0.5; %min-1
 k2 = 0.25; %min-1
 k3 = 0.1; %min-1
 
 t_range = linspace(0,20,120);
-global con kk1 kk2 kk3;
-i = 1;
-Ca = zeros(1,120);
-Cb = zeros(1,120);
-Cc = zeros(1,120);
+global kk1 kk2 kk3;
 
-
-for t = t_range
-    Ca(i) = Ca0*exp(-k1*t);
-    con = Ca(i);
     kk1 = k1;
     kk2 = k2;
     kk3 = k3;
-    [y,x] = ode45(@prob2,t_range,[0 0]);
-    Cb(i) = x(i,1);
-    Cc(i) = x(i,2);
-    i =i+1;
-end
+    [y,x] = ode45(@prob2,t_range,[Cb0 Cc0 Ca0]);
+    Cb = x(:,1);
+    Cc = x(:,2);
+    Ca = x(:,3);
 
+maxCb = max(Cb);
+idxMaxCb = find(Cb==maxCb);
 
 hold on
 plot(t_range,Ca,"- k")
 plot(t_range,Cb,"-- k")
 plot(t_range,Cc,": k")
+plot(t_range(idxMaxCb),maxCb,"o k");
 xlabel("time (min)")
 ylabel("Concetration - Cj")
 title("Concentration of components over time")
-legend("Ca","Cb","Cc")
+legend("Ca","Cb","Cc","Max Cb = 0.5242")
 hold off
 
 %Problem 4
@@ -189,8 +186,8 @@ yCH4 = 0.5; % molar fraction
 kCO2 = 0.37464 +1.54226*OmegaCO2 - 0.26992*(OmegaCO2.^2);
 kCH4 = 0.37464 +1.54226*OmegaCH4 - 0.26992*(OmegaCH4.^2);
 
-alfaCO2 = 1 + kCO2*(1-sqrt(T/TcCO2));
-alfaCH4 = 1 + kCH4*(1-sqrt(T/TcCH4));
+alfaCO2 = (1 + kCO2*(1-sqrt(T/TcCO2))).^2;
+alfaCH4 = (1 + kCH4*(1-sqrt(T/TcCH4))).^2;
 
 aCO2 = 0.45724*(((R.^2)*(TcCO2.^2))/PcCO2)*alfaCO2;
 aCH4 = 0.45724*(((R.^2)*(TcCH4.^2))/PcCH4)*alfaCH4;
@@ -238,15 +235,16 @@ lnphiCH4 = part1_2 - part2_2 - part3_2*part4_2*part5_2;
 phiCO2 = exp(lnphiCO2);
 phiCH4 = exp(lnphiCH4);
 
-fulgacityCO2 = phiCO2 * yCO2 * Pt; %f = 180.1616463507124 bar
-fulgacityCH4 = phiCH4 * yCH4 * Pt; %f = 241.9417151382955 bar
+fulgacityCO2 = phiCO2 * yCO2 * Pt; %f = 208.7810648391098 bar
+fulgacityCH4 = phiCH4 * yCH4 * Pt; %f = 265.5299366509511 bar
 
 function f = cmp(z,A,B)
 f = z.^3 - (1-B)*z.^2 + (A-3*(B.^2)-2*B)*z - (A*B -B.^2 - B.^3);
 end
 function u = prob2(t,x)
-    global con kk1 kk2 kk3;
-    dcbdt = kk1*con - kk2*x(1) + kk3*x(2);
+    global kk1 kk2 kk3;
+    dcadt = -kk1*x(3);
+    dcbdt = kk1*x(3) - kk2*x(1) + kk3*x(2);
     dccdt = kk2*x(1) - kk3*x(2);
-    u = [dcbdt;dccdt];
+    u = [dcbdt;dccdt;dcadt];
 end
