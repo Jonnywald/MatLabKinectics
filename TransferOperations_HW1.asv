@@ -22,12 +22,12 @@ p3 = p3 / 1e+6; %MPa
 %a)
 %state of stress at P
 sigma = [p1 0 0;
-         0 0 p3;
-         0 p2 0];
+         0 p2 0;
+         0 0 p3];
 
 % | 2  0  0 |
-% | 0  0 -4 |
 % | 0 -5  0 |
+% | 0  0 -4 |
 
 %b)
 %magnitute of the force
@@ -37,7 +37,7 @@ s = s.*s;
 s = sqrt(sum(s)); %Mpa
 s = s * 1e+6; %Pa
 f = s * area; %N
-%F = 3.807886552931953 N
+%F = 3.162277660168379 N
 
 %c)
 % the component of this force in N normal to the surface
@@ -46,7 +46,7 @@ sn = s .* n;
 sn = sum(sn); %MPa
 sn = sn * 1e+6; %Pa
 fn = sn * area; %N
-% Fn = 1N - normal to the surface
+% Fn = -1N - normal to the surface
 
 % Problem 2 - torsional rheometers
 
@@ -114,14 +114,14 @@ Eta1 = ((-k1*(gamma^n)*exp(a*t1)-k2)/a)*(Eta0 - EtaInf)+EtaInf; %2.3670944532630
 Tau1 = Eta1*gamma; % 23.670944532630160 Pa
 
 %(b)
-% "Second" Phase (0 - 10 s)
+% Second Phase
 t2 = 10.0; % s
 Eta2 = ((-k1*(gamma^n)*exp(a*t2)-k2)/a)*(Eta0 - EtaInf)+EtaInf; %1.974721018824596 Pa * S
 
-% "Third" Phase (10 - 15 s)
+% Third Phase
 t3 = 15.0; % s
 m2m0 = (Eta2 - EtaInf)/(Eta0 - EtaInf);
 gamma = 0;
 Eta3 = (((m2m0-1)*exp(-k2*(t3-t2)))+1)*(Eta0 - EtaInf)+EtaInf; % 2.053548212870349 Pa * S
-Tau3 = Eta3 * gamma; % 0 Pa
+Tau3 = Eta3 * gamma;
 
