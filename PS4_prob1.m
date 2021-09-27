@@ -74,6 +74,7 @@ cH = c(:,5);
 cC2H4 = c(:,6);
 cH2 = c(:,7);
 
+%conversion calculation
 XC2H6 = (cC2H60-cC2H6)./cC2H60;
 
 plot(v_span,XC2H6);
