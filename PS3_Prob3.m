@@ -88,15 +88,17 @@ Xa2 = (Fa1_0-Fa2)./Fa1_0;
 Xa3 = (Fa1_0-Fa3)./Fa1_0;
 
 
-% hold on;
-% plot(t_span,Xa1,"- k");
-% plot(t_span,Xa2,"-- k");
-% plot(t_span,Xa3,": k");
-% xlabel("time (min)");
-% ylabel("Conversion");
-% title("Cumulative conversion of A in each reactor");
-% legend("Xa1","Xa2","Xa3");
-% hold off;
+hold on;
+plot(t_span,Xa1,"- k");
+plot(t_span,Xa2,"-- k");
+plot(t_span,Xa3,": k");
+xlabel("time (min)");
+ylabel("Conversion");
+title("Cumulative conversion of A in each reactor");
+legend("Xa1","Xa2","Xa3");
+hold off;
+
+%conversion goes to zero if Ca0 = 0
 
 function f = prob3(t,x,V0,Vr,V1,V2,V3,k1,k2,k3,Ca0)
     dCa1dt = (V0/V1)*Ca0 + (Vr/V1)*x(2) - ((V0+Vr)/V1)*x(1) - k1*x(1);
