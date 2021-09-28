@@ -106,10 +106,10 @@ Cmet0 = 0;
 Cit = Ct0 * (1 - ymx0);
 
 %range of temperatures in kelvin
-t_range = linspace(300,3000,1000); %K
+t_range = linspace(600,1000,100); %K
 
-Cpx_2 = zeros(1,1000);
-Cmx_2 = zeros(1,1000);
+Cpx_2 = zeros(1,100);
+Cmx_2 = zeros(1,100);
 i = 1;
 options = optimset('TolFun',1e-9);
 guess = [0.025];
@@ -118,14 +118,14 @@ for t=t_range
     k1T = k1_0*exp(-E1/(R*t));
     k2T = k2_0*exp(-E2/(R*t));
     Cmx_2(i) = Cmx0 / (1 + k1T*tau2 +k2T*tau2);
-    Cpx_2(i) = (k2T*Cmx_2(i))*tau2;
+    Cpx_2(i) = result;
     i = i + 1;
 end
 
-maxC = max(Cpx_2); %0.013072912471449 mol/L
+maxC = max(Cpx_2);
 val = find(Cpx_2==maxC,1);
 
-BestTemp = t_range(val); %1194.59 K
+BestTemp = t_range(val);
 
 
 function f = func(v,c,V0,k1,k2)
@@ -134,4 +134,10 @@ dbendv = (k1*c(1))/V0;
 dmetdv = (k1*c(1))/V0;
 dpxdv = (k2*c(1))/V0;
 f = [dmxdv;dbendv;dmetdv;dpxdv];
+end
+function u = cstr(c,k1,k2,Cmx0,tau2)
+    u(1) = Cmx0 - c(1) + (-k1.*c(1) - k2.*c(1)).*tau2;
+%     u(2) = - c(2) + (k1.*c(1)).*tau2;
+%     u(3) =  - c(3) + (k1.*c(1)).*tau2;
+%     u(4) =  - c(4) + (k2.*c(1)).*tau2;
 end

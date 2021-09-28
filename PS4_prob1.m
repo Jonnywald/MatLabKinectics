@@ -77,10 +77,25 @@ cH2 = c(:,7);
 %conversion calculation
 XC2H6 = (cC2H60-cC2H6)./cC2H60;
 
-plot(v_span,XC2H6);
+%doing the same with 5% NO
+yNO = 0.05;
+yC2H6 = 1 - yNO;
+FNO0 = yNO*(P/(R_atm*T))*V0;
+FC2H60 = yC2H6*(P/(R_atm*T))*V0;
+cC2H60 = FC2H60/V0;
+cNO0 = FNO0/V0;
+[v,c] = ode15s(@(v,c)func(v,c,k1,kr1,k2,k3,k4,kr4,V0),v_span,[cC2H60 cNO0 0 0 0 0 0]);
+cC2H6_p = c(:,1);
+XC2H6_p = (cC2H60-cC2H6_p)./cC2H60;
+
+hold on
+plot(v_span,XC2H6_p,"-");
+plot(v_span,XC2H6,"--");
 xlabel("Volume (cm3)");
 ylabel("Conversion");
 title("Conversion by volume of PFR");
+legend("XC_2H_6 - 5% NO","XC_2H_6 - 5ppm NO");
+hold off
 
 %reducing the concentration of NO in the feed to 5 ppm, lowers the
 %conversion oh ethane siginificantly (from what as about 80% to 35%) as expected,
