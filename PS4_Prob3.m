@@ -111,8 +111,7 @@ t_range = linspace(300,3000,1000); %K
 Cpx_2 = zeros(1,1000);
 Cmx_2 = zeros(1,1000);
 i = 1;
-options = optimset('TolFun',1e-9);
-guess = [0.025];
+
 for t=t_range
     
     k1T = k1_0*exp(-E1/(R*t));
