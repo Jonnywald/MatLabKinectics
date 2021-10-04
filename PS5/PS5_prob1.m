@@ -52,24 +52,68 @@ dHr = dHr * 1000; %converting kcal/MolA to cal/MolA
 
 dCp = -Cpa -Cpb + Cpc;
 
-t_span = linspace(0,20,100);
-[t x] = ode45(@(t,x)fun(t,x,EaR,Tm,Q,dHr,dCp,Tr,km),t_span,[Ca0]);
+t_span = linspace(0,15,100);
+[t x] = ode45(@(t,x)fun(t,x,EaR,Tm,Q,dHr,km,VR,Cpa),t_span,[Ca0 Tr]);
 
 Ca = x(:,1);
+Xa = (Ca0 - Ca)./Ca0;
+T = x(:,2);
 
+subplot(1,3,1);
 plot(t,Ca);
+xlabel("time (min)");
+ylabel("Concetration Ca (mol/L)");
+title("Ca x Time");
+subplot(1,3,2);
+plot(t,Xa);
+xlabel("time (min)");
+ylabel("Conversion Xa");
+title("Xa x Time");
+subplot(1,3,3);
+plot(t,T);
+xlabel("time (min)");
+ylabel("Temperature (K)");
+title("Temp x Time");
 
-function f=fun(t,x,EaR,Tm,Q,dHr,dCp,Tr,km)
+%a)
+tmax = max(T); %2765.18 K
+timeTmax = t(find(T==tmax,1)); %6.21 min
+
+%b)
+i=1;
+for temp=T'
+   if temp<=Tr & i~=1
+       indexTimeT_return = i;
+       break;
+   end
+   i=i+1;
+end
+
+timeT_return = t(indexTimeT_return); %13.18 min
+
+%c)
+i=1;
+for time=Xa'
+   if time>=0.95
+       iXa = i;
+       break;
+   end
+   i=i+1;
+end
+time95 = t(iXa); %3.63 min
+
+function f=fun(t,x,EaR,Tm,Q,dHr,km,Vr,Cpa)
     
     Ca = x(1);
-    z = 2 - Ca;
-    T = Q/(dHr*dCp*z) + Tr;
+%     z = 2 - Ca;
+%     T = Q/(dHr*dCp*z) + Tr;
+    T = x(2);
     k = km*exp(-EaR*(1/T - 1/Tm));
     ra = - k*Ca^2;
     
     dCadt = ra;
-    
-    f = [dCadt];
+    dTdt = (-ra*Vr*-dHr+Q)/(Ca*Vr*Cpa);
+    f = [dCadt;dTdt];
 
 end
 
