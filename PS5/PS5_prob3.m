@@ -25,4 +25,7 @@
 % V = V0 * Ft/Ff * T/T0;
 
 %c) 
-% V*ro*Cp*dTdv = -dHr*r+2/R * Q(Ta-T)
+% V*ro*Cp*dTdv = -dHr*r + 2/R * Q
+% dTdv = (-dHr*(-K*Ca+kr*(Ca0-Ca))+2/R *Q)/V*ro
+
+

@@ -11,27 +11,49 @@
 Ca0 = 1.0; % mol/dm3
 Fa0 = 5.0; % mol/s
 
+V = Fa0/Ca0;
+
 % dHr = -231-0.012(T - 298)  %Kj/Mol
 
-Cpa = 0.1222 %Kj/mol*K
+Cpa = 0.1222; %Kj/mol*K
 
 %K = 1.48e11 * exp(-19.124/T) %dm3/mol*s
 
 T0 = 675; %K
 
 Ua = 5.0; %Kj/s*dm3/K
-
+R = 8.31446261815324 / 1000;
 
 Ta = 700; %K
 
 %a) determine the Xa in a Vr = 10 dm3 PFR with T0 = 675
+Vr = 10; %dm3
+v_span = linspace(0,Vr,200);
+y0 = [0 T0];
+[v x] = ode45(@(v,x)part_a(v,x,Fa0,Cpa,V,Ta,Ua,R),v_span,y0);
+Ca = x(:,1);
+temp = x(:,2);
+Xa = (Ca0 - Ca)./Ca0;
 
+subplot(1,2,1);
+plot(v,Xa);
+xlabel("Volume (dm3)");
+ylabel("Conversion Xa");
+title("Conversion x Volume");
+subplot(1,2,2);
+plot(v,temp);
+xlabel("Volume (dm3)");
+ylabel("temperature");
+title("temperature x Volume");
 
-function f=part_a(t,x)
-    Ca = x(1);
-    
+function f=part_a(v,x,Fa0,Cpa,V,Ta,Ua,R)
+    Ca = Ca0 * (1 - Xa);
+    T = x(2);
+    Ca = Ca0 * (1 - Xa);
+    dHr = -231-0.012*(T - 298);
     k = 1.48e11 * exp(-19.124/T);
     ra = k*Ca^2;
-    dCadv = ra/V;
-    f = [dCadv];
+    dXadv = ra/Fa0;
+    dTdv = (Ua*(Ta-T)+ra*(-dHr))/(Fa0*Cpa);
+    f = [dXadv;dTdv];
 end
