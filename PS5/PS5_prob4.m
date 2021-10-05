@@ -6,7 +6,12 @@
 % 2 VinylAcetylene -> Stylene
 % 2A -> B
 
-
+% Species | MolFeed Fi0| Exit (Fi) |  Exit    |     Ci      |
+%---------|------------|-----------|----------|-------------|
+% A       |    Fa0     |    Fa     |  Fa0 -2z | (Fa0 -2z)/V |
+% B       |    0       |    Fb     |   + z    |    z/V      |
+%---------|------------|-----------|----------|-------------|
+% Total   |Ff = Fa0+Fb0|    FT     |   Fa0-z  |   Ff/V      |
 
 Ca0 = 1.0; % mol/dm3
 Fa0 = 5.0; % mol/s
