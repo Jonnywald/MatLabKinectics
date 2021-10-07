@@ -44,17 +44,9 @@ dHr = dHr * 1000; %converting kcal/MolA to cal/MolA
 %Enrg. Balance
 % dTdt = (-ra*Vr*-dHr)/(Ca*Vr*Cpa)
 
-y0 = [Ca0, Tr];
-t_span = linspace(0,10,500);
-[t,x] = ode45(@(t,x)part_a(t,x,km,EaR,Tm,VR,Cpa,dHr),t_span,y0);
+[t,x] = ode45(@(t,x)part_a());
 
-Ca = x(:,1);
-Temp = x(:,2);
-subplot(1,2,1);
-plot(t,Ca);
-subplot(1,2,2);
-plot(t,Temp);
-function f=part_a(t,x,km,EaR,Tm,VR,Cpa,dHr)
+function f=part_a(t,x,km,Ear,Tm,VR,Cpa)
     Ca = x(1);
     T = x(2);
     
