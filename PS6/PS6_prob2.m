@@ -18,6 +18,9 @@ T0 = 45 + 273.15; %K
 
 Selectivity = 5;
 
+guess = 
+result = fsolve();
+
 function f=prob2(x)
 
 Ca = x(1);
@@ -36,5 +39,12 @@ ra = -r1 -r2;
 rb = r1;
 rc = r2;
 
+Q = Mf*Cp*(Ta - T);
+
+f(1) = Ca0*V0 - Ca*V + ra*Vr;
+f(2) = -Cb*V + rb*Vr;
+f(3) = -Cc*V + rc*Vr;
+f(4) = Q - (dHr1 + dHr2)*ra*Vr;
+f(5) = rb - Selectivity*rc;
 
 end
