@@ -12,6 +12,16 @@
 % A + B -> C + D  (1)
 % A + B -> E      (2)
 
+% Species | Fi0  | Exit (Fi) |  Exit    |     
+%---------|------|-----------|----------|
+% A       | Fa0  |    Fa     |Fa0-z1-z2 |
+% B       | Fb0  |    Fb     |Fb0-z1-z2 |
+% C       |   0  |    Fc     |    z1    |
+% D       |   0  |    Fd     |    z1    |
+% E       |   0  |    Fe     |    z2    |
+%---------|------|-----------|----------|
+% Total   | Ft0  |    Ft     | Ft0 - z2 |
+
 
 HfA = 0.0; %Kcal/Mol
 HfB = 4.88; %Kcal/Mol

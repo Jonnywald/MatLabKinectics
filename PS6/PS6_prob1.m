@@ -108,7 +108,7 @@ ylabel("Concentration (mol/L)");
 title("Temperature x Concentration of A");
 
 %E)
-Ua = 0.01 * 1000; % Cal/(min L K)
+Ua = -22.7; % Cal/(min L K)
 Ta = 300; %K
 y0 = [Ca0, Tr];
 t_span = linspace(0,3,500);
@@ -117,10 +117,7 @@ t_span = linspace(0,3,500);
 Ca = x(:,1);
 Temp = x(:,2);
 
-% plot(Temp,Ca);
-% xlabel("Temperature (K)");
-% ylabel("Concentration (mol/L)");
-% title("Temperature x Concentration of A");
+tmax = max(Temp); %349.75 K
 
 plot(t,Temp);
 
