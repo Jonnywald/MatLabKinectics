@@ -103,17 +103,17 @@ sgtitle("Plots for part ""a"" ");
 %B)
 %find the lowest concentration of species A in the reactor
 %assuming our reactor have a volume of Vr = 100L
-LowestA = min(Ca);
+LowestA = min(Ca)
 
 %C)
 %find the Highest concentration of species B in the reactor
 %assuming our reactor have a volume of Vr = 100L
-HighestB = max(Cb);
+HighestB = max(Cb)
 
 %D)
 %find the Highest concentration of species B in the reactor
 %assuming our reactor have a volume of Vr = 100L
-HighestA = max(Ca);
+HighestA = max(Ca)
 
 %E)
 %repeat for a pure feed of A
@@ -158,17 +158,17 @@ sgtitle("Plots for part ""e"" ");
 %B - E)
 %find the lowest concentration of species A in the reactor
 %assuming our reactor have a volume of Vr = 100L
-LowestA_E = min(Ca);
+LowestA_E = min(Ca)
 
 %C - E)
 %find the Highest concentration of species B in the reactor
 %assuming our reactor have a volume of Vr = 100L
-HighestB_E = max(Cb);
+HighestB_E = max(Cb)
 
 %D - E)
 %find the Highest concentration of species B in the reactor
 %assuming our reactor have a volume of Vr = 100L
-HighestA_E = max(Ca);
+HighestA_E = max(Ca)
 
 %the function for the exercise
 function f=PFR(v,x,V0,T0,Ua,Ta,dHr1,dHr2,Cpa,Cpb,Cpc)
