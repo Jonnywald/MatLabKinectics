@@ -56,8 +56,8 @@ dE = 18.49 / 1e9;
 dHr1_0 = -HfA - HfB + HfC + HfD; %Kcal/Mol
 dHr2_0 = -HfA - HfB + HfE; %Kcal/Mol
 
-dHr1_0 = dHr1_0 * 9.223e18; %Kcal/mol to BTU/lbmol
-dHr2_0 = dHr2_0 * 9.223e18; %Kcal/mol to BTU/lbmol
+% dHr1_0 = dHr1_0 * 9.223e18; %Kcal/mol to BTU/lbmol
+% dHr2_0 = dHr2_0 * 9.223e18; %Kcal/mol to BTU/lbmol
 
 Pt0 = 2; %atm
 len = 25; %ft
