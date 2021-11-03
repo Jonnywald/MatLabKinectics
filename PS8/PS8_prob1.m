@@ -99,4 +99,23 @@ k = exp(ln_k); % 10.0644 mol^-0.539 / (L^-0.539 * Min)
 beta0 = [10.0 1.5];
 x = fit2;
 y = df;
+beta = nlinfit(x,y,@rate,beta0);
+newy = rate(beta,x);
+
+figure;
+hold on;
+plot(x,y,"k*");
+plot(x,newy,"k-");
+xlabel("concentration of Br (mol/L)");
+ylabel("dCbr_2/dt");
+title("Non-linear regression");
+hold off;
+
+k = beta(1); % 0.0949 mol^-0.5090 / (L^-0.5090 * Min)
+n = beta(2); % 1.5090
+
+function dcdt = rate(beta, x)
+    dcdt = -beta(1)*x.^beta(2);
+end
+
 
