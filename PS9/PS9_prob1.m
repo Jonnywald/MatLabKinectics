@@ -14,8 +14,9 @@ x0(10) = cO20;
 x0(14) = cAr0;
 x0(13) = cCO20;
 x0(7) = cH20;
-x0(2) = 6.02e23;
+x0(2) = 6e40;
 timespan = logspace(-10,-2,50); %seconds
+% timespan = linspace(0,0.01,100); %seconds
 [t,x] = ode15s(@prob,timespan,x0);
 figure;
 loglog(t,x)
@@ -172,7 +173,7 @@ function f=prob(t,x)
     
     %Mass balances
     dCH4 = -r1-r2-r3-r4;
-    dM = r1+r10+r14+r22; %should it be like this?
+    dM = r1+r10+r14+r22;
     dCH3 = r1+r2+r3+r4-r5-r6;
     dH = r1-r3+r5-r9+r10-r13+r14+r15+r16+r17-r18-r19-r20-r21-r22;
     dOH = -r2+r4+r6+r7-r8+r11-r12-r15-r16+r17+r18-r19-r20+r21-r23;
@@ -184,7 +185,7 @@ function f=prob(t,x)
     dCHO = r7+r8+r9+r10-r11-r12-r13-r14;
     dCO = r11+r12+r13+r14-r15;
     dCO2 = r15;
-    dAr = r19; %same
+    dAr = r19;
     dHO2 = -r21+r22;
     
     f = [dCH4;dM;dCH3;dH;dOH;dH2O;dH2;dO;dCH2O;dO2;dCHO;dCO;dCO2;dAr;dHO2];
