@@ -1,0 +1,14 @@
+%chk=C:\Users\gpd20001\Desktop\MatLabKinectics\PS10\GaNH.chk
+# hf/3-21g geom=connectivity
+
+Title Card Required
+
+0 2
+ Ga                -0.40922873    0.00518783    0.00000000
+ N                  1.53574992   -0.13466224    0.00000000
+ H                  1.93584127    0.78181303    0.00000000
+
+ 1 2 2.0
+ 2 3 1.0
+ 3
+

@@ -14,8 +14,8 @@ x0(10) = cO20;
 x0(14) = cAr0;
 x0(13) = cCO20;
 x0(7) = cH20;
-x0(2) = 6e40;
-timespan = logspace(-10,-2,50); %seconds
+x0(2) = 1e20;
+timespan = logspace(-10,-2,200); %seconds
 % timespan = linspace(0,0.01,100); %seconds
 [t,x] = ode15s(@prob,timespan,x0);
 figure;
