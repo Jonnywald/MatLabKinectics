@@ -1,14 +1,10 @@
-%chk=C:\Users\gpd20001\Desktop\MatLabKinectics\PS10\GaNH.chk
-# hf/3-21g geom=connectivity
+# opt freq b3lyp/6-31g(d) 
 
-Title Card Required
+GaNH Optmization
 
 0 2
- Ga                -0.40922873    0.00518783    0.00000000
- N                  1.53574992   -0.13466224    0.00000000
- H                  1.93584127    0.78181303    0.00000000
+ Ga                 0.29290855   -1.29457962    0.00000000
+ N                  1.35122631   -0.12139441    0.00000000
+ H                  2.31999704    0.12656378    0.00000000
 
- 1 2 2.0
- 2 3 1.0
- 3
 
