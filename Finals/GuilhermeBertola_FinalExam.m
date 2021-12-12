@@ -47,6 +47,7 @@ v0 = F0/c; %m3/s
 %Heat flux
 Q = 2.52e6; %cal/(h*ft2)
 Q = Q*10.764; %cal/(h*m2)
+Q = Q/3600; %cal/(s*m2)
 
 %pipes data
 %2 inch diameter pipe
@@ -54,16 +55,20 @@ di_2 = 2.07; %in        Internal diameter
 ai_2 = 3.36; %in2       Internal Transverse Area
 di_2 = di_2 / 39.37;%m
 ai_2 = ai_2 / 1550;%m2
+ff_2 = 0.0050;%         Friction factor
 %4 inch diameter pipe
 di_4 = 4.03; %in        Internal diameter
 ai_4 = 12.73;%in2       Internal Transverse Area
 di_4 = di_4 / 39.37;%m
 ai_4 = ai_4 / 1550;%m2
+ff_4 = 0.0044;%         Friction factor
 %6 inch diameter pipe
 di_6 = 6.07; %in        Internal diameter
 ai_6 = 28.89;%in2       Internal Transverse Area
 di_6 = di_6 / 39.37;%m
 ai_6 = ai_6 / 1550;%m2
+ff_6 = 0.0044;%         Friction factor
+
 %heats of reactions
 %gaussian calculated (298 K)
 dH_H2_gau = -1.162033; %Hartrees
@@ -78,9 +83,138 @@ dH_reac = vA*dH_C3H8_gau; %hartrees
 
 dH_Gau_298 = dH_prod - dH_reac; %hartrees
 dH_Gau_298 = dH_Gau_298 * 627.5095; %Kcal/mol
+dH_Gau_298 = dH_Gau_298 * 1000; %cal/mols
 
+%length of the reactor (m)
+len_span = linspace(0,100,200);
 
-function f=PFR(L,x,F0,M0,v0,Q,Tr,dH_ref,A,ff,D)
+%initial conditions
+y0 = [F0,0,0,0,0,0,T0,P0];
+
+%RUNS%
+%Gaussian dH
+%2 in
+Tr = 298; %K
+dH_ref = dH_Gau_298; %cal/mol
+A = ai_2;
+D = di_2;
+ff = ff_2;
+[l,x] = ode45(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D),len_span,y0);
+T = x(:,7); %K
+P = x(:,8); %Pa
+P = P./6895;%psia
+Fa = x(:,1);%mol/s
+Xa = (F0-Fa)./F0;
+Xa = Xa*100; % (%)
+figure;
+subplot(2,2,1);
+plot(l,T);
+title("Temperature vs Length");
+xlabel("Length (m)");
+ylabel("Temperature (K)");
+subplot(2,2,2);
+plot(l,P);
+title("Pressure vs Length");
+xlabel("Length (m)");
+ylabel("Pressure (psia)");
+subplot(2,2,[3,4]);
+plot(l,Xa);
+title("Conversion vs Length");
+xlabel("Length (m)");
+ylabel("Conversion (%)");
+sgtitle("2 in diameter 100 m length");
+%4 in
+Tr = 298; %K
+dH_ref = dH_Gau_298; %cal/mol
+A = ai_4;
+D = di_4;
+ff = ff_4;
+[l,x] = ode45(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D),len_span,y0);
+T = x(:,7); %K
+P = x(:,8); %Pa
+P = P./6895;%psia
+Fa = x(:,1);%mol/s
+Xa = (F0-Fa)./F0;
+Xa = Xa*100; % (%)
+figure;
+subplot(2,2,1);
+plot(l,T);
+title("Temperature vs Length");
+xlabel("Length (m)");
+ylabel("Temperature (K)");
+subplot(2,2,2);
+plot(l,P);
+title("Pressure vs Length");
+xlabel("Length (m)");
+ylabel("Pressure (psia)");
+subplot(2,2,[3,4]);
+plot(l,Xa);
+title("Conversion vs Length");
+xlabel("Length (m)");
+ylabel("Conversion (%)");
+sgtitle("4 in diameter 100 m length");
+%6 in
+Tr = 298; %K
+dH_ref = dH_Gau_298; %cal/mol
+A = ai_6;
+D = di_6;
+ff = ff_6;
+[l,x] = ode45(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D),len_span,y0);
+T = x(:,7); %K
+P = x(:,8); %Pa
+P = P./6895;%psia
+Fa = x(:,1);%mol/s
+Xa = (F0-Fa)./F0;
+Xa = Xa*100; % (%)
+figure;
+subplot(2,2,1);
+plot(l,T);
+title("Temperature vs Length");
+xlabel("Length (m)");
+ylabel("Temperature (K)");
+subplot(2,2,2);
+plot(l,P);
+title("Pressure vs Length");
+xlabel("Length (m)");
+ylabel("Pressure (psia)");
+subplot(2,2,[3,4]);
+plot(l,Xa);
+title("Conversion vs Length");
+xlabel("Length (m)");
+ylabel("Conversion (%)");
+sgtitle("6 in diameter 100 m length");
+%6 in DH exam
+Tr = 8.664833333333333e2; %K
+dH_ref = 21.96*1000; %cal/mol
+A = ai_6;
+D = di_6;
+ff = ff_6;
+[l,x] = ode45(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D),len_span,y0);
+T = x(:,7); %K
+P = x(:,8); %Pa
+P = P./6895;%psia
+Fa = x(:,1);%mol/s
+Xa = (F0-Fa)./F0;
+Xa = Xa*100; % (%)
+figure;
+subplot(2,2,1);
+plot(l,T);
+title("Temperature vs Length");
+xlabel("Length (m)");
+ylabel("Temperature (K)");
+subplot(2,2,2);
+plot(l,P);
+title("Pressure vs Length");
+xlabel("Length (m)");
+ylabel("Pressure (psia)");
+subplot(2,2,[3,4]);
+plot(l,Xa);
+title("Conversion vs Length");
+xlabel("Length (m)");
+ylabel("Conversion (%)");
+sgtitle("6 in diameter 100 m length (exam given enthalpy)");
+%PFR Function
+function f=PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D)
 %variables
 Fa = x(1);
 Fb = x(2);
@@ -90,8 +224,6 @@ Fe = x(5);
 Ff = x(6);
 T = x(7);
 P = x(8);
-%Density of Propane gas
-rho = 1.898; %Kg/m3
 %R gas constant
 R = 1.98720425864083;%cal/(mol*K)
 %rate constant (s-1)
@@ -118,11 +250,13 @@ Ce = (Ca0 - Ca) * 0.653; %mol/m3
 Cf = (Ca0 - Ca) * 0.3; %mol/m3
 %reaction rate
 ra = -k*Ca; %mol/s*m3
-rb = k*Cb; %mol/s*m3
-rc = k*Cc; %mol/s*m3
-rd = k*Cd; %mol/s*m3
-re = k*Ce; %mol/s*m3
-rf = k*Cf; %mol/s*m3
+rb = -k*Cb; %mol/s*m3
+rc = -k*Cc; %mol/s*m3
+rd = -k*Cd; %mol/s*m3
+re = -k*Ce; %mol/s*m3
+rf = -k*Cf; %mol/s*m3
+%Density 
+rho = M0/v; %Kg/m3
 %heat of reaction
 dH = dH_ref + dCp*(T-Tr);
 %Temperature along the length of the reactor
@@ -142,7 +276,7 @@ dFedl = re * A;
 dFfdl = rf * A;
 %pressure drop along the length of the reactor
 G = M0 * A;
-dPdl = -(2*ff*G^2)/(rho*D);
+dPdl = -(2*ff*(G^2))/(rho*D);
 %final
 f = [dFadl;dFbdl;dFcdl;dFddl;dFedl;dFfdl;dTdl;dPdl];
 end
