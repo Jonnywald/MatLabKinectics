@@ -4,6 +4,14 @@
 % C3H8 -> 0.3 C3H6 + 0.065 C2H6 + 0.6675 C2H4 + 0.635 CH4 + 0.3 H2
 % A -> 0.3 B + 0.065 C + 0.6675 D + 0.635 E + 0.3 F
 
+%Letter | Molecule
+%  A    |   C3H8
+%  B    |   C3H6
+%  C    |   C2H6
+%  D    |   C2H4
+%  E    |   CH4
+%  F    |   H2
+
 %stoic table
 % Species | Fi0  | Exit (Fi) |     Exit (Ci)     |     
 %---------|------|-----------|-------------------|
@@ -14,15 +22,13 @@
 % E       |   0  |    0.653z |  0.635*F0*Xa / v  |
 % F       |   0  |    0.3z   |   0.3*F0*Xa / v   |
 %---------|------|-----------|-------------------|
-% Total   |  F0  |    Ft     |  F0-0.9855*F0*Xa  |
+% Total   |  F0  |    Ft     |  F0-0.9855*F0*Xa/v|
 
-%Letter | Molecule
-%  A    |   C3H8
-%  B    |   C3H6
-%  C    |   C2H6
-%  D    |   C2H4
-%  E    |   CH4
-%  F    |   H2
+% Fa0 = F0
+% Fa = F0 - F0*Xa
+% Fa = F0 - z
+% then
+% z = F0*Xa (extent of reaction)
 
 %stoic indexes
 vA = 1;
@@ -65,22 +71,28 @@ Q = Q/3600; %cal/(s*m2)
 %2 inch diameter pipe
 di_2 = 2.07; %in        Internal diameter
 ai_2 = 3.36; %in2       Internal Transverse Area
+do_2 = 2.375; %in       External Diameter
 wpft_2 = 3.65; %lb/ft   Weight per length
 di_2 = di_2 / 39.37;%m
+do_2 = do_2 / 39.37;%m
 ai_2 = ai_2 / 1550;%m2
 ff_2 = 0.0050;%         Friction factor
 %4 inch diameter pipe
 di_4 = 4.03; %in        Internal diameter
 ai_4 = 12.73;%in2       Internal Transverse Area
+do_4 = 4.500; %in       External Diameter
 wpft_4 = 10.79;%lb/ft   Weight per length
 di_4 = di_4 / 39.37;%m
+do_4 = do_4 / 39.37;%m
 ai_4 = ai_4 / 1550;%m2
 ff_4 = 0.0044;%         Friction factor
 %6 inch diameter pipe
 di_6 = 6.07; %in        Internal diameter
 ai_6 = 28.89;%in2       Internal Transverse Area
+do_6 = 6.625; %in       External Diameter
 wpft_6 = 18.97;%lb/ft   Weight per length
 di_6 = di_6 / 39.37;%m
+do_6 = do_6 / 39.37;%m
 ai_6 = ai_6 / 1550;%m2
 ff_6 = 0.0044;%         Friction factor
 
@@ -101,7 +113,7 @@ dH_Gau_298 = dH_Gau_298 * 627.5095; %Kcal/mol
 dH_Gau_298 = dH_Gau_298 * 1000; %cal/mols
 
 %length of the reactor (m)
-len_span = linspace(0,300,200); %300 m ~ 1000ft
+len_span = linspace(0,426,400); %426 m ~ 1400 ft
 
 %initial conditions
 y0 = [F0,0,0,0,0,0,T0,P0];
@@ -114,9 +126,10 @@ dH_ref = dH_Gau_298; %cal/mol
 %Pipe data:
 A = ai_2;
 D = di_2;
+DO = do_2;
 ff = ff_2;
 %ODE run
-[l,x] = ode15s(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D),len_span,y0);
+[l,x] = ode15s(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D,DO),len_span,y0);
 T_2_in = x(:,7); %K
 P_2_in = x(:,8); %Pa
 P_2_in = P_2_in./6895;%psia
@@ -149,9 +162,10 @@ dH_ref = dH_Gau_298; %cal/mol
 %Pipe data:
 A = ai_4;
 D = di_4;
+DO = do_4;
 ff = ff_4;
 %ODE run
-[l,x] = ode15s(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D),len_span,y0);
+[l,x] = ode15s(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D,DO),len_span,y0);
 T_4_in = x(:,7); %K
 P_4_in = x(:,8); %Pa
 P_4_in = P_4_in./6895;%psia
@@ -184,9 +198,10 @@ dH_ref = dH_Gau_298; %cal/mol
 %Pipe data:
 A = ai_6;
 D = di_6;
+DO = do_6;
 ff = ff_6;
 %ODE run
-[l,x] = ode15s(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D),len_span,y0);
+[l,x] = ode15s(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D,DO),len_span,y0);
 T_6_in = x(:,7); %K
 P_6_in = x(:,8); %Pa
 P_6_in = P_6_in./6895;%psia
@@ -217,9 +232,9 @@ sgtitle("6 inches diameter pipe");
 figure;
 subplot(2,2,1);
 hold on;
-plot(L_2_in,T_2_in,"k*");
-plot(L_4_in,T_4_in,"ko");
-plot(L_6_in,T_6_in,"k");
+plot(L_2_in,T_2_in,"k-");
+plot(L_4_in,T_4_in,"k--");
+plot(L_6_in,T_6_in,"k:");
 title("Temperature vs Length");
 xlabel("Length (ft)");
 ylabel("Temperature (K)");
@@ -227,9 +242,9 @@ legend("2 in","4 in","6 in");
 hold off;
 subplot(2,2,2);
 hold on;
-plot(L_2_in,P_2_in,"k*");
-plot(L_4_in,P_4_in,"ko");
-plot(L_6_in,P_6_in,"k");
+plot(L_2_in,P_2_in,"k-");
+plot(L_4_in,P_4_in,"k--");
+plot(L_6_in,P_6_in,"k:");
 title("Pressure vs Length");
 xlabel("Length (ft)");
 ylabel("Pressure (psia)");
@@ -237,9 +252,9 @@ legend("2 in","4 in","6 in");
 hold off;
 subplot(2,2,[3,4]);
 hold on;
-plot(L_2_in,Xa_2_in,"k*");
-plot(L_4_in,Xa_4_in,"ko");
-plot(L_6_in,Xa_6_in,"k");
+plot(L_2_in,Xa_2_in,"k-");
+plot(L_4_in,Xa_4_in,"k--");
+plot(L_6_in,Xa_6_in,"k:");
 title("Conversion vs Length");
 xlabel("Length (ft)");
 ylabel("Conversion (%)");
@@ -247,38 +262,149 @@ legend("2 in","4 in","6 in");
 hold off;
 sgtitle("Grouped plots");
 
-%6 in DH exam
+%6 in  - DH exam
 Tr = 8.664833333333333e2; %K
 dH_ref = 21.96*1000; %cal/mol
+%Pipe data:
 A = ai_6;
 D = di_6;
+DO = do_6;
 ff = ff_6;
-[l,x] = ode15s(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D),len_span,y0);
-T = x(:,7); %K
-P = x(:,8); %Pa
-P = P./6895;%psia
-Fa = x(:,1);%mol/s
-Xa = (F0-Fa)./F0;
-Xa = Xa*100; % (%)
+%ODE run
+[l,x] = ode15s(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D,DO),len_span,y0);
+T_6_in_dh = x(:,7); %K
+P_6_in_dh = x(:,8); %Pa
+P_6_in_dh = P_6_in_dh./6895;%psia
+Fa_6_in_dh = x(:,1);%mol/s
+Xa_6_in_dh = (F0-Fa_6_in_dh)./F0;
+Xa_6_in_dh = Xa_6_in_dh*100; % (%)
+L_6_in_dh = l * 3.281; %ft
+%Plots
 figure;
 subplot(2,2,1);
-plot(l,T);
+plot(L_6_in_dh,T_6_in_dh);
 title("Temperature vs Length");
-xlabel("Length (m)");
+xlabel("Length (ft)");
 ylabel("Temperature (K)");
 subplot(2,2,2);
-plot(l,P);
+plot(L_6_in_dh,P_6_in_dh);
 title("Pressure vs Length");
-xlabel("Length (m)");
+xlabel("Length (ft)");
 ylabel("Pressure (psia)");
 subplot(2,2,[3,4]);
-plot(l,Xa);
+plot(L_6_in_dh,Xa_6_in_dh);
 title("Conversion vs Length");
-xlabel("Length (m)");
+xlabel("Length (ft)");
 ylabel("Conversion (%)");
-sgtitle("6 in diameter 100 m length (exam given enthalpy)");
+sgtitle("6 inches diameter pipe (with exan given dH)");
+
+%comparison between the gaussian and the given value
+figure;
+subplot(3,1,1);
+hold on;
+plot(L_6_in,Xa_6_in,"k-");
+plot(L_6_in_dh,Xa_6_in_dh,"k--");
+title("Conversion vs Length (6 in)");
+xlabel("Length (ft)");
+ylabel("Conversion (%)");
+legend("Gaussian","Given");
+hold off;
+subplot(3,1,2);
+hold on;
+plot(L_4_in,Xa_4_in,"k-");
+plot(L_4_in_dh,Xa_4_in_dh,"k--");
+title("Conversion vs Length (4 in)");
+xlabel("Length (ft)");
+ylabel("Conversion (%)");
+legend("Gaussian","Given");
+hold off;
+subplot(3,1,3);
+hold on;
+plot(L_2_in,Xa_2_in,"k-");
+plot(L_2_in_dh,Xa_2_in_dh,"k--");
+title("Conversion vs Length (2 in)");
+xlabel("Length (ft)");
+ylabel("Conversion (%)");
+legend("Gaussian","Given");
+hold off;
+sgtitle("Comparison of given Heat of reaction vs Gaussian calculated");
+
+
+
+%4 in  - DH exam
+Tr = 8.664833333333333e2; %K
+dH_ref = 21.96*1000; %cal/mol
+%Pipe data:
+A = ai_4;
+D = di_4;
+DO = do_4;
+ff = ff_4;
+%ODE run
+[l,x] = ode15s(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D,DO),len_span,y0);
+T_4_in_dh = x(:,7); %K
+P_4_in_dh = x(:,8); %Pa
+P_4_in_dh = P_4_in_dh./6895;%psia
+Fa_4_in_dh = x(:,1);%mol/s
+Xa_4_in_dh = (F0-Fa_4_in_dh)./F0;
+Xa_4_in_dh = Xa_4_in_dh*100; % (%)
+L_4_in_dh = l * 3.281; % ft
+%Plots
+figure;
+subplot(2,2,1);
+plot(L_4_in_dh,T_4_in_dh);
+title("Temperature vs Length");
+xlabel("Length (ft)");
+ylabel("Temperature (K)");
+subplot(2,2,2);
+plot(L_4_in_dh,P_4_in_dh);
+title("Pressure vs Length");
+xlabel("Length (ft)");
+ylabel("Pressure (psia)");
+subplot(2,2,[3,4]);
+plot(L_4_in_dh,Xa_4_in_dh);
+title("Conversion vs Length");
+xlabel("Length (ft)");
+ylabel("Conversion (%)");
+sgtitle("4 inches diameter pipe (with exam given dH)");
+
+%2 in  - DH exam
+Tr = 8.664833333333333e2; %K
+dH_ref = 21.96*1000; %cal/mol
+%Pipe data:
+A = ai_2;
+D = di_2;
+DO = do_2;
+ff = ff_2;
+%ODE run
+[l,x] = ode15s(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D,DO),len_span,y0);
+T_2_in_dh = x(:,7); %K
+P_2_in_dh = x(:,8); %Pa
+P_2_in_dh = P_2_in_dh./6895;%psia
+Fa_2_in_dh = x(:,1);%mol/s
+Xa_2_in_dh = (F0-Fa_2_in_dh)./F0;
+Xa_2_in_dh = Xa_2_in_dh*100; % (%)
+L_2_in_dh = l * 3.281; % ft
+%Plots
+figure;
+subplot(2,2,1);
+plot(L_2_in_dh,T_2_in_dh);
+title("Temperature vs Length");
+xlabel("Length (ft)");
+ylabel("Temperature (K)");
+subplot(2,2,2);
+plot(L_2_in_dh,P_2_in_dh);
+title("Pressure vs Length");
+xlabel("Length (ft)");
+ylabel("Pressure (psia)");
+subplot(2,2,[3,4]);
+plot(L_2_in_dh,Xa_2_in_dh);
+title("Conversion vs Length");
+xlabel("Length (ft)");
+ylabel("Conversion (%)");
+sgtitle("2 inches diameter pipe (with exam given dH)");
+
 %PFR Function
-function f=PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D)
+function f=PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D,DO)
 %variables
 Fa = x(1);
 Fb = x(2);
@@ -292,32 +418,31 @@ P = x(8);
 R = 1.98720425864083;%cal/(mol*K)
 %rate constant (s-1)
 k = 3.98e12*exp(-59100/(R*T));
+%conversion
+Xa = (F0-Fa)/F0;
 %total molar flow
 Ft = Fa+Fb+Fc+Fd+Fe+Ff; %mol/s
 %volumetric flow
 v = v0*(Ft/F0)*(T/T0)*(P0/P); %m3/s
-%conversion
-Xa = (F0-Fa)/F0;
 %concentrations
-Ca = Fa/v; %mol/m3
-Ca0 = F0/v0; %mol/m3
-Cb = 0.3*F0*Xa / v; %mol/m3
-Cc = 0.065*F0*Xa / v; %mol/m3
-Cd = 0.6675*F0*Xa / v; %mol/m3
-Ce = 0.635*F0*Xa / v; %mol/m3
-Cf = 0.3*F0*Xa / v; %mol/m3
+Ca = (F0-F0*Xa)/v; %mol/m3
+Cb = (0.3*F0*Xa) / v; %mol/m3
+Cc = (0.065*F0*Xa) / v; %mol/m3
+Cd = (0.6675*F0*Xa) / v; %mol/m3
+Ce = (0.635*F0*Xa) / v; %mol/m3
+Cf = (0.3*F0*Xa) / v; %mol/m3
 %reaction rate
 ra = -k*Ca; %mol/s*m3
-rb = -k*Cb; %mol/s*m3
-rc = -k*Cc; %mol/s*m3
-rd = -k*Cd; %mol/s*m3
-re = -k*Ce; %mol/s*m3
-rf = -k*Cf; %mol/s*m3
+rb = k*Cb; %mol/s*m3
+rc = k*Cc; %mol/s*m3
+rd = k*Cd; %mol/s*m3
+re = k*Ce; %mol/s*m3
+rf = k*Cf; %mol/s*m3
 %Density 
 rho = M0/v; %Kg/m3
 %heat of reaction
 dH = dH_ref + integral(@dCP,Tr,T);
-%Heat capacities
+%Heat capacities (cal/molK)
 cpA = 21.14 + 0.02056*T;
 cpB = 17.88 + 0.01645*T;
 cpC = 13.34 + 0.01589*T;
@@ -326,7 +451,7 @@ cpE = 6.98 + 0.01012*T;
 cpF = 6.42 + 0.00082*T;
 %Temperature along the length of the reactor
 FiCpi = Fa*cpA + Fb*cpB + Fc*cpC + Fd*cpD + Fe*cpE + Fd*cpD + Ff*cpF;
-dTdl = (ra*dH - Q)/(FiCpi) * A;
+dTdl = (ra*dH - Q*(1/(2*pi*(DO/2))))/(FiCpi) * A;
 %Molar flow of A along the length of the reactor
 dFadl = ra * A;
 %Molar flow of B along the length of the reactor
