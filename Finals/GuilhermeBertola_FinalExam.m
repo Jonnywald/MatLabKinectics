@@ -101,7 +101,7 @@ dH_Gau_298 = dH_Gau_298 * 627.5095; %Kcal/mol
 dH_Gau_298 = dH_Gau_298 * 1000; %cal/mols
 
 %length of the reactor (m)
-len_span = linspace(0,300,500); %300 m ~ 1000ft
+len_span = linspace(0,300,200); %300 m ~ 1000ft
 
 %initial conditions
 y0 = [F0,0,0,0,0,0,T0,P0];
@@ -213,13 +213,47 @@ xlabel("Length (ft)");
 ylabel("Conversion (%)");
 sgtitle("6 inches diameter pipe");
 
+%grouped plots
+figure;
+subplot(2,2,1);
+hold on;
+plot(L_2_in,T_2_in,"k*");
+plot(L_4_in,T_4_in,"ko");
+plot(L_6_in,T_6_in,"k");
+title("Temperature vs Length");
+xlabel("Length (ft)");
+ylabel("Temperature (K)");
+legend("2 in","4 in","6 in");
+hold off;
+subplot(2,2,2);
+hold on;
+plot(L_2_in,P_2_in,"k*");
+plot(L_4_in,P_4_in,"ko");
+plot(L_6_in,P_6_in,"k");
+title("Pressure vs Length");
+xlabel("Length (ft)");
+ylabel("Pressure (psia)");
+legend("2 in","4 in","6 in");
+hold off;
+subplot(2,2,[3,4]);
+hold on;
+plot(L_2_in,Xa_2_in,"k*");
+plot(L_4_in,Xa_4_in,"ko");
+plot(L_6_in,Xa_6_in,"k");
+title("Conversion vs Length");
+xlabel("Length (ft)");
+ylabel("Conversion (%)");
+legend("2 in","4 in","6 in");
+hold off;
+sgtitle("Grouped plots");
+
 %6 in DH exam
 Tr = 8.664833333333333e2; %K
 dH_ref = 21.96*1000; %cal/mol
 A = ai_6;
 D = di_6;
 ff = ff_6;
-[l,x] = ode45(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D),len_span,y0);
+[l,x] = ode15s(@(L,x)PFR(L,x,T0,P0,F0,M0,v0,Q,Tr,dH_ref,A,ff,D),len_span,y0);
 T = x(:,7); %K
 P = x(:,8); %Pa
 P = P./6895;%psia
@@ -306,7 +340,7 @@ dFedl = re * A;
 %Molar flow of F along the length of the reactor
 dFfdl = rf * A;
 %pressure drop along the length of the reactor
-G = M0 * A;
+G = M0 / A;
 dPdl = -(2*ff*(G^2))/(rho*D);
 %final
 f = [dFadl;dFbdl;dFcdl;dFddl;dFedl;dFfdl;dTdl;dPdl];
